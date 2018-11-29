@@ -10,15 +10,20 @@ def main():
     queue = sqs.get_queue_by_name(QueueName='a-kube-test-queue.fifo')
 
     # Process message
-    for message in queue.receive_messages():
+    for message in queue.receive_messages(MessageAttributeNames=['Sleep']):
         # Print out the body 
-        print('Processing message: {0}'.format(message.body))
+        print('Processing message: {0}.'.format(message.body))
 
-        # Let the queue know that the message is processed
+        sleep_num = 10
+        if message.message_attributes is not None:
+            sleep_str = message.message_attributes.get('Sleep').get('StringValue')
+            if sleep_str:
+                sleep_num = int(sleep_str)
+
         message.delete()
 
-        # Sleep to simulate processing
-        time.sleep(10)
+        print('Sleeping for {0} to simulate work.'.format(sleep_num))
+        time.sleep(sleep_num)
 
 if __name__ == '__main__':
     main()

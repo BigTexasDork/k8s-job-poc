@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import boto3
 from kubernetes import client, config, watch
+from random import randint
 
 def createJob(api, counter):
     jobName = f"job-search-worker-{counter}"
@@ -52,12 +53,18 @@ def main():
     for msg in ["one", "two", "three", "four", "five", "six", "seven", "eight"]:
         cntr += 1
         response = queue.send_message(
-            MessageBody=msg,
-            MessageGroupId="travelers"
+            MessageBody=msg + str(randint(0,999)),
+            MessageGroupId="travelers",
+            MessageAttributes={
+                'Sleep': {
+                    'StringValue': str(randint(10,29)),
+                    'DataType': 'Number'
+                }
+            }
         )
 
-        print(response.get('MessageId'))
-        print(response.get('MD5OfMessageBody'))
+        print('MessageId: {0}'.format(response.get('MessageId')))
+        print('MD5OfMessageBody: {0}'.format(response.get('MD5OfMessageBody')))
         createJob(api, cntr)
 
 if __name__ == '__main__':
