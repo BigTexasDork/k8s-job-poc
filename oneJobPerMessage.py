@@ -9,7 +9,11 @@ def createJob(api, counter):
     # Create and configure a container
     container = client.V1Container(
         name="c",
-        image="bigtexasdork/job-search-worker"
+        image="bigtexasdork/job-search-worker",
+        resources=client.V1ResourceRequirements(
+            limits={"memory": "500M", "cpu": "1"},
+            requests={"memory": "300M", "cpu": ".5"}
+        )
     )
 
     # Create and configure a spec section
