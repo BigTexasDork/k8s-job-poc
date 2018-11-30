@@ -22,7 +22,7 @@ def main():
 
         message.delete()
 
-        print('Sleeping for {0} seconds to simulate work.'.format(sleep_num))
+        print('Sleeping for {0} to simulate work.'.format(sleep_num))
         time.sleep(sleep_num)
 
 if __name__ == '__main__':

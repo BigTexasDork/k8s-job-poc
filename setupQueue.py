@@ -25,7 +25,8 @@ def createJob(api, counter):
     jobSpec = client.V1JobSpec(
         completions=1,
         parallelism=1,
-        template=template
+        template=template,
+        ttl_seconds_after_finished=15
     )
 
     # Create the Job
@@ -49,12 +50,13 @@ def main():
 
     queue = sqs.get_queue_by_name(QueueName='a-kube-test-queue.fifo')
 
-    cntr = 0
-    for msg in ["one", "two", "three", "four", "five", "six", "seven", "eight"]:
+    cntr = 0 # used for job name uniqueness
+    data = [line.strip() for line in open("50words", 'r')]
+    for msg in data:
         cntr += 1
         response = queue.send_message(
-            MessageBody=msg + str(randint(0,999)),
-            MessageGroupId="travelers",
+            MessageBody=msg + str(randint(0,999)), # randomize the msg
+            MessageGroupId="travelers",            # needed for FIFO
             MessageAttributes={
                 'Sleep': {
                     'StringValue': str(randint(10,29)),
